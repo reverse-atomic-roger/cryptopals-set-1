@@ -25,16 +25,19 @@ def normalise_hamming(edit_dist:int, keysize:int) -> int:
 def rank_key_sizes(message:str, key_size_range) -> list:
     normalised_distances = []
     for size in key_size_range:
-        normalised_distances.append(normalise_hamming(calculate_hamming(message[:size], message[size:size*2]), size))
+        distance = normalise_hamming(calculate_hamming(message[:size], message[size:size*2]), size)
+        result = (distance, size)                                               
+        normalised_distances.append(result)
     
-    ## TODO sort the list with a lambda
-
-    return normalised_distances
-
+    return sorted(normalised_distances, key = lambda message: message[0])
+                  
 def main():
     with open("6.txt") as file:
         plaintext = file.readlines()
-    print(rank_key_sizes(plaintext, range(2,40)))
+    results = (rank_key_sizes(plaintext, range(2,45)))
+
+    for result in results:
+        print(result)
 
 if __name__ == "__main__":
     main()
