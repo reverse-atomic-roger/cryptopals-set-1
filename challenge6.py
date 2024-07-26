@@ -1,8 +1,3 @@
-test_string1 = "this is a test"
-test_string2 = "wokka wokka!!!"
-
-
-
 def string_to_bytes(string:str) -> bytes:
     some_bytes = []
     for char in string:
