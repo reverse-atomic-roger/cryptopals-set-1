@@ -17,15 +17,6 @@ def calculate_hamming(string1:str, string2:str) -> int:
 def normalise_hamming(edit_dist:int, keysize:int) -> int:
     return edit_dist/keysize
 
-# def rank_key_sizes(message:str, key_size_range) -> list:
-#     normalised_distances = []
-#     for size in key_size_range:
-#         distance = normalise_hamming(calculate_hamming(message[:size], message[size:size*2]), size)
-#         result = (distance, size)                                               
-#         normalised_distances.append(result)
-    
-#     return sorted(normalised_distances, key = lambda message: message[0])
-
 def rank_key_sizes(message:str, key_size_range:range, number_of_blocks:int) -> list:
     normalised_distances = []
     for size in key_size_range:
@@ -37,15 +28,30 @@ def rank_key_sizes(message:str, key_size_range:range, number_of_blocks:int) -> l
         normalised_distances.append(result)
     
     return sorted(normalised_distances, key = lambda message: message[0])
+
+def split_message(message:str, blocksize:int) -> list:
+    blocks = []
+    try:
+        number_of_blocks = int(len(message)/blocksize)
+    except:
+        print("blocksize does not fit perfectly in message")
+    for block in range(number_of_blocks):
+        blocks.append(message[blocksize:blocksize+1])
+    return blocks
                   
 def main():
     with open("6.txt") as file:
         cyphertext = file.readlines()
     cyphertext = "".join(cyphertext)
-    results = (rank_key_sizes(cyphertext, range(2,45), 4))
+    key_sizes = (rank_key_sizes(cyphertext, range(2,45), 4))
 
-    for result in results:
-        print(result)
+    print("Three most likely key sizes, with Hamming distances:")
+    for size in key_sizes[:3]:
+        print(size)
+    
+    rearranged_message = split_message(cyphertext, key_sizes[0][1])
+
+    print(rearranged_message)
 
 if __name__ == "__main__":
     main()
