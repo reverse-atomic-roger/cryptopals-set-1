@@ -56,10 +56,12 @@ def challenge1(hex_string:str) -> str:
     return base64string
 
 def challenge2(hex_string1:str, hex_string2:str) -> str:
+    # convert hex to int for efficient XOR
     buffer1 = int(hex_string1, 16)
     buffer2 = int(hex_string2, 16)
-
+    # XOR ints
     xor_result = buffer1 ^ buffer2
+    # strip the "0x" from the returned hex string
     return hex(xor_result)[2:]
 
 def main():
