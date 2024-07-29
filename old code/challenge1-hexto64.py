@@ -8,6 +8,7 @@ base64string = base64.b64encode(hexstringbytes)
 
 target = "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t"
 result = base64string.decode()
+#result = hexstringbytes.decode()
 
 if target == result:
     print("Success!!!")
