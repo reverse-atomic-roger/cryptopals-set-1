@@ -152,6 +152,8 @@ def challenge3() -> list:
     for key in keys:
         plaintexts.append(challenge2(hex_3, key))
 
+    #TODO convert bytes back to strings before scoring. bytes.decode() ?
+
     #for each output, score message(message)
     scored_texts = []
     for item in plaintexts:
