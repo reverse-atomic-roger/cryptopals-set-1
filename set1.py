@@ -137,8 +137,32 @@ def generate_key_list() -> list:
         key_list.append(hex(ord(char)))
     return key_list
 
-def challenge3():
-    ...
+def challenge3() -> list:
+    # generate a list of possible keys, ie all printable characters
+    chars = generate_key_list()
+
+    # repeat each key so that its length matches the message length
+    keys = []
+    #for each key repeat key for message length extend_short_key(message, key)
+    for key in chars:
+        keys.append(extend_short_key(hex_3, key))
+
+    #for each key, xor with message challenge2(message, key)
+    plaintexts = []
+    for key in keys:
+        plaintexts.append(challenge2(hex_3, key))
+
+    #for each output, score message(message)
+    scored_texts = []
+    for item in plaintexts:
+        if not item.isprintable():
+            continue
+        scored_texts.append((score_message(item), item))
+
+    #sort messages by score list.sort()
+    scored_texts.sort()
+
+    return scored_texts
 
 def main():
     # print("Challenge 1:")
@@ -150,6 +174,9 @@ def main():
     # print(challenge2(hex_2_1, hex_2_2))
     # if challenge2(hex_2_1, hex_2_2) == hex_2_3:
     #     print("Challenge 2 successfully completed!\n\n")
+
+    for item in challenge3():
+        print(item)
 
 
 if __name__ == "__main__":
