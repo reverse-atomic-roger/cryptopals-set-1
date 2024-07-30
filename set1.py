@@ -124,8 +124,9 @@ def score_message(message:str) -> float:
 
 def extend_short_key(message:str, key:str) -> str:
     # add key repetitions until the key is as long as the message
-    while len(message) < len(key):
+    while len(message) > len(key):
         key += key
+    key = key[:len(message)]
     return key
 
 def generate_key_list() -> list:
@@ -134,7 +135,7 @@ def generate_key_list() -> list:
     # loop through every printable character
     for char in string.printable:
     # ord() returns a numeric value for each char. hex() converts it to hex notation
-        key_list.append(hex(ord(char)))
+        key_list.append(hex(ord(char))[2:])
     return key_list
 
 def challenge3() -> list:
@@ -179,7 +180,7 @@ def main():
 
     for item in challenge3():
         print(item)
-
+    
 
 if __name__ == "__main__":
     main()
