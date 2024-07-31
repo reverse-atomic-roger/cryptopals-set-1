@@ -89,14 +89,17 @@ def challenge1(hex_string:str) -> str:
     return base64string
 
 # Challenge 2:
-def challenge2(hex_string1:str, hex_string2:str) -> str:
+def xor_equal_buffers(hex_string1:str, hex_string2:str) -> int:
     # convert hex to int for efficient XOR
     buffer1 = int(hex_string1, 16)
     buffer2 = int(hex_string2, 16)
     # XOR ints
     xor_result = buffer1 ^ buffer2
     # strip the "0x" from the returned hex string
-    return hex(xor_result)[2:]
+    return xor_result
+
+def challenge2():
+    return hex(xor_equal_buffers(hex_2_1, hex_2_2))[2:]
 
 # Challenge 3:
 def get_frequency(message:str, char:str) -> float:
@@ -122,10 +125,11 @@ def score_message(message:str) -> float:
         score += abs(get_frequency(message, char) - letter_frequencies[char])
     return score
 
-def extend_short_key(message:str, key:str) -> str:
-    # add key repetitions until the key is as long as the message
-    while len(message) > len(key):
-        key += key
+def extend_char_key(message:str, key:str) -> str:
+    # multiply key by message length. Sometimes this gives a longer key than a message. Maybe some chars are more than 
+    # one message length unit. Even though they're both strings. so we then have to slice. using len(message) works here
+    # even though I'd think it did the same thing as in the first line :/
+    key = key * len(message)
     key = key[:len(message)]
     return key
 
@@ -151,7 +155,7 @@ def challenge3() -> list:
     #for each key, xor with message challenge2(message, key)
     plaintexts = []
     for key in keys:
-        plaintexts.append(challenge2(hex_3, key))
+        plaintexts.append(hex(xor_equal_buffers(hex_3, key))[2:])
 
     #TODO convert bytes back to strings before scoring. bytes.decode() ?
 
@@ -174,8 +178,8 @@ def main():
     #     print("Challenge 1 successfully completed!\n\n")
               
     # print("Challenge 2:")
-    # print(challenge2(hex_2_1, hex_2_2))
-    # if challenge2(hex_2_1, hex_2_2) == hex_2_3:
+    # print(challenge2())
+    # if challenge2() == hex_2_3:
     #     print("Challenge 2 successfully completed!\n\n")
 
     for item in challenge3():
