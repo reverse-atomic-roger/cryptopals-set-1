@@ -10,7 +10,7 @@ hex_2_2 = "686974207468652062756c6c277320657965"
 hex_2_3 = "746865206b696420646f6e277420706c6179"
 #
 # Challenge 3: take the hex encoded inout and find the single char it has been XOR'd with. Use a function to rank candidates using letter frequencies
-hex_3 = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b373"
+hex_3 = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736"
 letter_frequencies = {
     "a":8.2,
     "b":1.5,
@@ -89,17 +89,16 @@ def challenge1(hex_string:str) -> str:
     return base64string
 
 # Challenge 2:
-def xor_equal_buffers(hex_string1:str, hex_string2:str) -> int:
-    # convert hex to int for efficient XOR
-    buffer1 = int(hex_string1, 16)
-    buffer2 = int(hex_string2, 16)
-    # XOR ints
-    xor_result = buffer1 ^ buffer2
-    # strip the "0x" from the returned hex string
+def xor_equal_buffers(message:bytes, key:bytes) -> bytes:
+    xor_result = bytes([a ^ b for a, b in zip(message, key)])
     return xor_result
 
 def challenge2():
-    return hex(xor_equal_buffers(hex_2_1, hex_2_2))[2:]
+    byte_stream1 = bytes.fromhex(hex_2_1)
+    byte_stream2 = bytes.fromhex(hex_2_2)
+    result = xor_equal_buffers(byte_stream1, byte_stream2)
+    result = result.hex()
+    return result
 
 # Challenge 3:
 def get_frequency(message:str, char:str) -> float:
@@ -125,44 +124,38 @@ def score_message(message:str) -> float:
         score += abs(get_frequency(message, char) - letter_frequencies[char])
     return score
 
-def extend_char_key(message:str, key:str) -> str:
-    # multiply key by message length. Sometimes this gives a longer key than a message. Maybe some chars are more than 
-    # one message length unit. Even though they're both strings. so we then have to slice. using len(message) works here
-    # even though I'd think it did the same thing as in the first line :/
-    key = key * len(message)
-    key = key[:len(message)]
-    return key
-
 def generate_key_list() -> list:
     # initialise an empty list for results
     key_list = []
     # loop through every printable character
     for char in string.printable:
     # ord() returns a numeric value for each char. hex() converts it to hex notation
-        key_list.append(hex(ord(char))[2:])
+        key_list.append(ord(char))
     return key_list
+
+def single_byte_xor(message:bytes, key:int) -> bytes:
+    xor_result = [bytes(a ^ key) for a in message]
+    print(xor_result)
+    result = bytes().join(xor_result)
+    return result
 
 def challenge3() -> list:
     # generate a list of possible keys, ie all printable characters
-    chars = generate_key_list()
+    keys = generate_key_list()
 
-    # repeat each key so that its length matches the message length
-    keys = []
-    #for each key repeat key for message length extend_short_key(message, key)
-    for key in chars:
-        keys.append(extend_short_key(hex_3, key))
+    # convert the provided message to bytes bytes.fromhex()
+    message = bytes.fromhex(hex_3)
 
-    #for each key, xor with message challenge2(message, key)
+    #for each key, xor with message single_byte_xor(message, key)
     plaintexts = []
     for key in keys:
-        plaintexts.append(hex(xor_equal_buffers(hex_3, key))[2:])
-
-    #TODO convert bytes back to strings before scoring. bytes.decode() ?
+        plaintexts.append(single_byte_xor(message, key))
 
     #for each output, score message(message)
     scored_texts = []
     for item in plaintexts:
         if not item.isprintable():
+            print(item)
             continue
         scored_texts.append((score_message(item), item))
 
