@@ -134,8 +134,9 @@ def generate_key_list() -> list:
     return key_list
 
 def single_byte_xor(message:bytes, key:int) -> bytes:
-    xor_result = [bytes(a ^ key) for a in message]
-    print(xor_result)
+    # xor each chunk of message with the key. bytes() requires a list or else will just output a number of null bytes
+    xor_result = [bytes([chunk ^ key]) for chunk in message]
+    # join the list of bytes (the outer [] on the above line) to make a single bytes object
     result = bytes().join(xor_result)
     return result
 
@@ -151,18 +152,19 @@ def challenge3() -> list:
     for key in keys:
         plaintexts.append(single_byte_xor(message, key))
 
-    #for each output, score message(message)
+    # for each output, score message(message). we need to decode() the bytes to a string first item.decode()
+    # append sensible (ie, printable) candidates to a list, along with their frequency based score.
     scored_texts = []
     for item in plaintexts:
+        item = item.decode()
         if not item.isprintable():
-            print(item)
             continue
         scored_texts.append((score_message(item), item))
 
-    #sort messages by score list.sort()
+    # sort messages by score list.sort()
     scored_texts.sort()
 
-    return scored_texts
+    return scored_texts[0]
 
 def main():
     # print("Challenge 1:")
@@ -175,9 +177,9 @@ def main():
     # if challenge2() == hex_2_3:
     #     print("Challenge 2 successfully completed!\n\n")
 
-    for item in challenge3():
-        print(item)
-    
+    # print("Challenge 3:")
+    # print(challenge3()[1])
+    ...
 
 if __name__ == "__main__":
     main()
