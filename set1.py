@@ -9,8 +9,13 @@ hex_2_1 = "1c0111001f010100061a024b53535009181c"
 hex_2_2 = "686974207468652062756c6c277320657965"
 hex_2_3 = "746865206b696420646f6e277420706c6179"
 #
-# Challenge 3: take the hex encoded inout and find the single char it has been XOR'd with. Use a function to rank candidates using letter frequencies
+# Challenge 3: take the hex encoded inout and find the single char it has been XOR'd with. Use a function to rank 
+# candidates using letter frequencies
 hex_3 = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736"
+#
+# Cahllenge 4: take all the lines in the attached file, 4.txt, and find the one that is encrypted with single byte xor
+file_4 = "4.txt"
+#
 letter_frequencies = {
     "a":8.2,
     "b":1.5,
@@ -140,12 +145,12 @@ def single_byte_xor(message:bytes, key:int) -> bytes:
     result = bytes().join(xor_result)
     return result
 
-def challenge3() -> list:
+def brute_force_single_byte(message:str) -> list:
     # generate a list of possible keys, ie all printable characters
     keys = generate_key_list()
 
     # convert the provided message to bytes bytes.fromhex()
-    message = bytes.fromhex(hex_3)
+    message = bytearray.fromhex(message)
 
     #for each key, xor with message single_byte_xor(message, key)
     plaintexts = []
@@ -156,15 +161,31 @@ def challenge3() -> list:
     # append sensible (ie, printable) candidates to a list, along with their frequency based score.
     scored_texts = []
     for item in plaintexts:
-        item = item.decode()
+        item = item.decode(encoding='ascii', errors='ignore')
         if not item.isprintable():
             continue
         scored_texts.append((score_message(item), item))
 
     # sort messages by score list.sort()
     scored_texts.sort()
+    # return the first item, ie, the one with the lowest (best) score. Note this is challenge code. In real life
+    # we would return a few candidates and check with humans if it was of critical importance
+    scored_texts
+    return scored_texts[:5]
+    
+def challenge3() -> str:
+    result = brute_force_single_byte(hex_3)
+    return result[1]
 
-    return scored_texts[0]
+def challenge4():
+    texts = []
+    with open(file_4) as file:
+        texts = file.readlines()
+    results = []
+    for text in texts:
+        results.append(brute_force_single_byte(text))
+    return results
+
 
 def main():
     # print("Challenge 1:")
@@ -178,7 +199,17 @@ def main():
     #     print("Challenge 2 successfully completed!\n\n")
 
     # print("Challenge 3:")
-    # print(challenge3()[1])
+    # print(challenge3())
+
+    print("Challenge 4:")
+    results = challenge4()
+    full_list = []
+    for result in results:
+        for option in result:
+            if option[0] < 70:
+                full_list.append(option)
+    for item in full_list:
+        print(item)
     ...
 
 if __name__ == "__main__":
