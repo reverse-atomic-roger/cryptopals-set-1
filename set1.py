@@ -150,7 +150,7 @@ def brute_force_single_byte(message:str) -> list:
     keys = generate_key_list()
 
     # convert the provided message to bytes bytes.fromhex()
-    message = bytearray.fromhex(message)
+    message = bytes.fromhex(message)
 
     #for each key, xor with message single_byte_xor(message, key)
     plaintexts = []
@@ -161,7 +161,12 @@ def brute_force_single_byte(message:str) -> list:
     # append sensible (ie, printable) candidates to a list, along with their frequency based score.
     scored_texts = []
     for item in plaintexts:
-        item = item.decode(encoding='ascii', errors='ignore')
+        #if bytes.decode() gives an error, then our decryption has given gibberish, skip it
+        try:
+            item = item.decode()
+        except:
+            continue
+        # if the result isn't printable, probably also gibberish, skip it
         if not item.isprintable():
             continue
         scored_texts.append((score_message(item), item))
@@ -170,12 +175,11 @@ def brute_force_single_byte(message:str) -> list:
     scored_texts.sort()
     # return the first item, ie, the one with the lowest (best) score. Note this is challenge code. In real life
     # we would return a few candidates and check with humans if it was of critical importance
-    scored_texts
-    return scored_texts[:5]
+    return scored_texts[:1]
     
 def challenge3() -> str:
     result = brute_force_single_byte(hex_3)
-    return result[1]
+    return result[0]
 
 def challenge4():
     texts = []
@@ -206,8 +210,8 @@ def main():
     full_list = []
     for result in results:
         for option in result:
-            if option[0] < 70:
-                full_list.append(option)
+            full_list.append(option)
+    full_list.sort()
     for item in full_list:
         print(item)
     ...
