@@ -59,7 +59,8 @@ def convert_hex_to_int(hex_string:str) -> int:
     return int(hex_string, 16)
 
 def convert_hex_to_bytes(hex_string:str) -> bytes:
-    return bytes.fromhex(hex_string)
+    return base64.b16decode(hex_string, casefold=True)  # casefold to allow lower case alphabet chars
+    # or bytes.fromhex(hex_string)
 
 def convert_bytes_to_base64(some_bytes:bytearray) -> bytes:
     return base64.b64encode(some_bytes)
@@ -86,7 +87,7 @@ def convert_base64_to_bytes(base64_string:str) -> bytes:
 # Challenge 1:
 def challenge1(hex_string:str) -> str:
     # convert from hex to bytes
-    some_bytes = bytes.fromhex(hex_string)
+    some_bytes = base64.b16decode(hex_string, casefold=True)
     # then convert to base64
     b64bytes = base64.b64encode(some_bytes)
     # then finally decode the bytes to a string
@@ -129,15 +130,6 @@ def score_message(message:str) -> float:
         score += abs(get_frequency(message, char) - letter_frequencies[char])
     return score
 
-def generate_key_list() -> list:
-    # initialise an empty list for results
-    key_list = []
-    # loop through every printable character
-    for char in string.printable:
-    # ord() returns a numeric value for each char. hex() converts it to hex notation
-        key_list.append(ord(char))
-    return key_list
-
 def single_byte_xor(message:bytes, key:int) -> bytes:
     # xor each chunk of message with the key. bytes() requires a list or else will just output a number of null bytes
     xor_result = [bytes([chunk ^ key]) for chunk in message]
@@ -146,50 +138,46 @@ def single_byte_xor(message:bytes, key:int) -> bytes:
     return result
 
 def brute_force_single_byte(message:str) -> list:
-    # generate a list of possible keys, ie all printable characters
-    keys = generate_key_list()
-
     # convert the provided message to bytes bytes.fromhex()
+    #message = base64.b16decode(message, casefold=True)
     message = bytes.fromhex(message)
 
-    #for each key, xor with message single_byte_xor(message, key)
+    #for each key, xor with message: single_byte_xor(message, key)
     plaintexts = []
-    for key in keys:
-        plaintexts.append(single_byte_xor(message, key))
-
-    # for each output, score message(message). we need to decode() the bytes to a string first item.decode()
-    # append sensible (ie, printable) candidates to a list, along with their frequency based score.
-    scored_texts = []
-    for item in plaintexts:
-        #if bytes.decode() gives an error, then our decryption has given gibberish, skip it
+    for key in range(256):
+        pt = single_byte_xor(message, key)
         try:
-            item = item.decode()
+            pt = pt.decode()
         except:
             continue
-        # if the result isn't printable, probably also gibberish, skip it
-        if not item.isprintable():
-            continue
-        scored_texts.append((score_message(item), item))
+        pt = pt.strip()
+        if pt.isprintable():
+            score = score_message(pt)
+            plaintexts.append((score, pt, key))
+        
+    plaintexts.sort()
 
-    # sort messages by score list.sort()
-    scored_texts.sort()
-    # return the first item, ie, the one with the lowest (best) score. Note this is challenge code. In real life
-    # we would return a few candidates and check with humans if it was of critical importance
-    return scored_texts[:1]
-    
-def challenge3() -> str:
-    result = brute_force_single_byte(hex_3)
-    return result[0]
+    return plaintexts[0]
+   
+def challenge3():
+    print(brute_force_single_byte(hex_3))
 
 def challenge4():
-    texts = []
-    with open(file_4) as file:
-        texts = file.readlines()
-    results = []
-    for text in texts:
-        results.append(brute_force_single_byte(text))
-    return results
+    candidates = []
+    with open("4.txt") as f:
+        for line in f:
+            candidates.append(line)
 
+    results = []
+    for candidate in candidates:
+        try:
+            result = brute_force_single_byte(candidate)
+        except:
+            continue
+        results.append(result)
+    
+    results.sort()
+    print(results[0])
 
 def main():
     # print("Challenge 1:")
@@ -202,19 +190,9 @@ def main():
     # if challenge2() == hex_2_3:
     #     print("Challenge 2 successfully completed!\n\n")
 
-    # print("Challenge 3:")
-    # print(challenge3())
+    #challenge3()
 
-    print("Challenge 4:")
-    results = challenge4()
-    full_list = []
-    for result in results:
-        for option in result:
-            full_list.append(option)
-    full_list.sort()
-    for item in full_list:
-        print(item)
-    ...
-
+    challenge4()
+    
 if __name__ == "__main__":
     main()
