@@ -13,8 +13,17 @@ hex_2_3 = "746865206b696420646f6e277420706c6179"
 # candidates using letter frequencies
 hex_3 = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736"
 #
-# Cahllenge 4: take all the lines in the attached file, 4.txt, and find the one that is encrypted with single byte xor
+# Challenge 4: take all the lines in the attached file, 4.txt, and find the one that is encrypted with single byte xor
 file_4 = "4.txt"
+#
+# Challenge 5:  Here is the opening stanza of an important work of the English language, 
+# encrypt it, under the key "ICE", using repeating-key XOR.
+#
+string5 = """Burning 'em, if you ain't quick and nimble
+I go crazy when I hear a cymbal
+"""
+#
+key5 = "ICE".encode()
 #
 letter_frequencies = {
     "a":8.2,
@@ -179,6 +188,32 @@ def challenge4():
     results.sort()
     print(results[0])
 
+def challenge5():
+    messagebytes = string5.encode()
+    first_blocks = []
+    for i in range(0,len(messagebytes), 3):
+        first_blocks.append(messagebytes[i] ^ key5[0])
+    second_blocks = []
+    for i in range(1, len(messagebytes), 3):
+        second_blocks.append(messagebytes[i] ^ key5[1])
+    third_blocks = []
+    for i in range(2, len(messagebytes), 3):
+        third_blocks.append(messagebytes[i] ^ key5[2])
+    
+        answer = list(zip(first_blocks, second_blocks, third_blocks))
+
+    answer_bytes = []
+    for item in answer:
+        answer_bytes.append(item[0].to_bytes(1, byteorder='big'))
+        answer_bytes.append(item[1].to_bytes(1, byteorder='big'))
+        answer_bytes.append(item[2].to_bytes(1, byteorder='big'))
+
+    joined_answer_bytes = b"".join(answer_bytes)
+    print()
+    print(joined_answer_bytes.hex())
+    ...
+
+
 def main():
     # print("Challenge 1:")
     # print(challenge1(hex_1))
@@ -192,7 +227,9 @@ def main():
 
     #challenge3()
 
-    challenge4()
+    #challenge4()
+
+    challenge5()
     
 if __name__ == "__main__":
     main()
