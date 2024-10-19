@@ -20,8 +20,7 @@ file_4 = "4.txt"
 # encrypt it, under the key "ICE", using repeating-key XOR.
 #
 string5 = """Burning 'em, if you ain't quick and nimble
-I go crazy when I hear a cymbal
-"""
+I go crazy when I hear a cymbal"""
 #
 key5 = "ICE".encode()
 #
@@ -204,6 +203,7 @@ def challenge5():
 
     answer_bytes = []
     for item in answer:
+        # these are the defaults for to_bytes() according to the docs, but python was throwing errors :/
         answer_bytes.append(item[0].to_bytes(1, byteorder='big'))
         answer_bytes.append(item[1].to_bytes(1, byteorder='big'))
         answer_bytes.append(item[2].to_bytes(1, byteorder='big'))
